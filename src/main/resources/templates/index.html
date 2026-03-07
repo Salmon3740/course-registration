@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration & Notification System</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="landing-page">
+    <div class="landing-container glass-panel">
+        <h1>Online Student Registration System</h1>
+        <p>A fast, secure, and modern way to manage your course enrollments.</p>
+        
+        <div class="action-buttons">
+            <a th:href="@{/login}" class="btn primary-btn">Login to Dashboard</a>
+            <a th:href="@{/register}" class="btn secondary-btn">Create an Account</a>
+        </div>
+    </div>
+</body>
+</html>

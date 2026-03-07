@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-page">
+
+    <nav class="navbar glass-panel">
+        <div class="nav-brand">RegistrationSystem</div>
+        <div class="nav-profile">
+            <span th:text="'Welcome, ' + ${studentName}">Welcome, Student</span>
+            <a th:href="@{/logout}" class="btn danger-btn-small">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Messages -->
+        <div th:if="${successMessage}" class="alert alert-success mt-20">
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-error mt-20">
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Available Courses Grid -->
+        <div class="section-header">
+            <h2>Available Courses</h2>
+            <p>Select your preferred courses from the list below.</p>
+        </div>
+
+        <div class="cards-grid">
+            <div th:each="course : ${courses}" class="course-card glass-panel interactive-card">
+                <h3 th:text="${course.courseName}">Course Name</h3>
+                <div class="card-details">
+                    <span class="badge" th:classappend="${course.availableSeats > 0 ? 'badge-success' : 'badge-danger'}"
+                        th:text="${course.availableSeats} + ' Seats Available'">Seats</span>
+                </div>
+                <div class="card-actions">
+                    <form th:action="@{/web/enroll}" method="POST" class="inline-form">
+                        <input type="hidden" name="courseId" th:value="${course.id}" />
+                        <button type="submit" class="btn primary-btn btn-block"
+                            th:disabled="${course.availableSeats == 0}">Enroll</button>
+                    </form>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(courses)}" class="empty-state">
+                No courses are currently available.
+            </div>
+        </div>
+
+        <!-- My Enrollments -->
+        <div class="section-header mt-40">
+            <h2>My Enrollments</h2>
+            <p>Courses you are currently enrolled in.</p>
+        </div>
+
+        <div class="list-container glass-panel">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Enrollment ID</th>
+                        <th>Course Name</th>
+                        <th>Enrollment Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="enrollment : ${myEnrollments}">
+                        <td th:text="${enrollment.id}">1</td>
+                        <td th:text="${enrollment.course.courseName}">Course Name</td>
+                        <td th:text="${#temporals.format(enrollment.enrollmentDate, 'dd-MMM-yyyy HH:mm')}">Date</td>
+                        <td>
+                            <form th:action="@{/web/drop}" method="POST">
+                                <input type="hidden" name="courseId" th:value="${enrollment.course.id}" />
+                                <button type="submit" class="btn danger-btn">Drop</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(myEnrollments)}">
+                        <td colspan="4" class="text-center text-muted">You are not enrolled in any courses yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Registration System</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-box glass-panel">
+        <h2 class="auth-title">Create Account</h2>
+        <p class="auth-subtitle">Join us and manage your studies effectively.</p>
+
+        <div th:if="${errorMessage}" class="alert alert-error">
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <form th:action="@{/web/register}" method="POST">
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required placeholder="John Doe">
+            </div>
+
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="john@example.com">
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Create a strong password">
+            </div>
+
+            <button type="submit" class="btn primary-btn btn-block">Register</button>
+        </form>
+
+        <p class="auth-footer">
+            Already have an account? <a th:href="@{/login}">Sign In</a>
+        </p>
+    </div>
+
+</body>
+
+</html>

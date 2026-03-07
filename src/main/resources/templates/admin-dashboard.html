@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-page admin-theme">
+
+    <nav class="navbar glass-panel">
+        <div class="nav-brand">RegistrationSystem <span class="badge badge-warning">ADMIN</span></div>
+        <div class="nav-profile">
+            <span>Welcome, Administrator</span>
+            <a th:href="@{/logout}" class="btn danger-btn-small">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Messages -->
+        <div th:if="${successMessage}" class="alert alert-success mt-20">
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-error mt-20">
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <div class="admin-grid">
+            <!-- Add Course Form -->
+            <div class="glass-panel p-20 sticky-form">
+                <div class="section-header">
+                    <h2>Add New Course</h2>
+                </div>
+                <form th:action="@{/web/admin/course/add}" method="POST">
+                    <div class="input-group">
+                        <label for="courseName">Course Title</label>
+                        <input type="text" id="courseName" name="courseName" required placeholder="e.g. Advanced Java">
+                    </div>
+                    <div class="input-group">
+                        <label for="availableSeats">Available Seats</label>
+                        <input type="number" id="availableSeats" name="availableSeats" min="1" required
+                            placeholder="50">
+                    </div>
+                    <button type="submit" class="btn primary-btn btn-block">Publish Course</button>
+                </form>
+            </div>
+
+            <!-- Manage Courses -->
+            <div class="list-container glass-panel">
+                <div class="section-header">
+                    <h2>Manage Active Courses</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Course Name</th>
+                            <th>Available Seats</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="course : ${courses}">
+                            <td th:text="${course.id}">1</td>
+                            <td th:text="${course.courseName}" class="font-semibold">Course Name</td>
+                            <td>
+                                <span class="badge"
+                                    th:classappend="${course.availableSeats > 0 ? 'badge-success' : 'badge-danger'}"
+                                    th:text="${course.availableSeats}"></span>
+                            </td>
+                            <td>
+                                <form th:action="@{/web/admin/course/delete}" method="POST">
+                                    <input type="hidden" name="courseId" th:value="${course.id}" />
+                                    <button type="submit" class="btn danger-btn">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(courses)}">
+                            <td colspan="4" class="text-center text-muted">No courses found. Add one on the left.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
