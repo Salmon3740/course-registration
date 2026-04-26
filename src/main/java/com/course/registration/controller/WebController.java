@@ -51,13 +51,36 @@ public class WebController {
         return "register";
     }
 
+    private static final String ADMIN_SECRET_KEY = "COURSE_REGISTRATION_ADMIN";
+
     @PostMapping("/web/register")
     public String handleRegistration(@RequestParam String name, @RequestParam String email,
-            @RequestParam String password, RedirectAttributes redirectAttributes) {
+            @RequestParam String password,
+            @RequestParam(value = "secretKey", required = false, defaultValue = "") String secretKey,
+            RedirectAttributes redirectAttributes) {
         try {
-            Student student = new Student(name, email, password);
+            String role;
+            if (!secretKey.isEmpty() && secretKey.equals(ADMIN_SECRET_KEY)) {
+                role = "ADMIN";
+            } else if (!secretKey.isEmpty()) {
+                // Wrong key entered — register as STUDENT but warn
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "You are not an admin. Registered as a Student instead.");
+                role = "STUDENT";
+            } else {
+                role = "STUDENT";
+            }
+
+            Student student = new Student(name, email, password, role);
             studentService.saveStudent(student);
-            redirectAttributes.addFlashAttribute("successMessage", "Registration successful. Please login.");
+
+            if ("ADMIN".equals(role)) {
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Admin registration successful! You now have admin privileges. Please login.");
+            } else {
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Registration successful. Please login.");
+            }
             return "redirect:/login";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Registration failed. Email might already exist.");
@@ -68,7 +91,7 @@ public class WebController {
     @PostMapping("/web/login")
     public String handleLogin(@RequestParam String email, @RequestParam String password,
             HttpSession session, RedirectAttributes redirectAttributes) {
-        // Admin hardcoded logic
+        // Legacy hardcoded admin (kept for backward compatibility)
         if ("admin@system.com".equals(email) && "admin123".equals(password)) {
             session.setAttribute("adminLoggedIn", true);
             return "redirect:/admin/dashboard";
@@ -76,8 +99,15 @@ public class WebController {
 
         Student student = studentService.login(email, password);
         if (student != null) {
-            session.setAttribute("loggedInUser", student);
-            return "redirect:/student/dashboard";
+            if ("ADMIN".equals(student.getRole())) {
+                // Registered admin — grant admin session
+                session.setAttribute("adminLoggedIn", true);
+                session.setAttribute("adminName", student.getName());
+                return "redirect:/admin/dashboard";
+            } else {
+                session.setAttribute("loggedInUser", student);
+                return "redirect:/student/dashboard";
+            }
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Invalid email or password.");
             return "redirect:/login";
@@ -99,11 +129,7 @@ public class WebController {
             return "redirect:/login";
 
         List<Course> allCourses = courseService.getAllCourses();
-        // This is simplified; ideally we retrieve Course entities the student is
-        // actively enrolled in
-        List<Enrollment> enrollments = enrollmentService.getAllEnrollments().stream()
-                .filter(e -> e.getStudent().getId().equals(loggedInStudent.getId()))
-                .toList();
+        List<Enrollment> enrollments = enrollmentService.getEnrollmentsByStudentId(loggedInStudent.getId());
 
         model.addAttribute("studentName", loggedInStudent.getName());
         model.addAttribute("courses", allCourses);

@@ -18,6 +18,9 @@ public class Student {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String role = "STUDENT"; // STUDENT or ADMIN
+
     // Constructors
     public Student() {
     }
@@ -26,6 +29,14 @@ public class Student {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = "STUDENT";
+    }
+
+    public Student(String name, String email, String password, String role) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
     // Getters and Setters
@@ -59,5 +70,13 @@ public class Student {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

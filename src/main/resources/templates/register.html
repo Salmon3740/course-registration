@@ -35,6 +35,14 @@
                 <input type="password" id="password" name="password" required placeholder="Create a strong password">
             </div>
 
+            <div class="input-group">
+                <label for="secretKey">Admin Secret Key <span style="font-weight:400; font-size:0.85rem; opacity:0.6;">(optional)</span></label>
+                <input type="password" id="secretKey" name="secretKey" placeholder="Enter admin key to register as admin">
+                <small style="display:block; margin-top:4px; opacity:0.55; font-size:0.8rem;">
+                    Leave blank to register as a Student. Enter the secret key if you are an admin.
+                </small>
+            </div>
+
             <button type="submit" class="btn primary-btn btn-block">Register</button>
         </form>
 

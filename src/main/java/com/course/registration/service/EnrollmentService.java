@@ -27,7 +27,7 @@ public class EnrollmentService {
     private StudentRepository studentRepository;
 
     @Autowired
-    private NotificationService notificationService;
+    private EmailService emailService;
 
     @Transactional
     public Enrollment enrollStudent(Long studentId, Long courseId) {
@@ -50,8 +50,8 @@ public class EnrollmentService {
         Enrollment enrollment = new Enrollment(student, course, LocalDateTime.now());
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
 
-        // Send JMS notification
-        notificationService.sendEnrollmentNotification(student.getEmail(), student.getName(), course.getCourseName());
+        // Send Email notification asynchronously
+        emailService.sendRegistrationEmail(student.getEmail(), student.getName(), course.getCourseName());
 
         return savedEnrollment;
     }
@@ -70,6 +70,10 @@ public class EnrollmentService {
 
     public List<Enrollment> getAllEnrollments() {
         return enrollmentRepository.findAll();
+    }
+
+    public List<Enrollment> getEnrollmentsByStudentId(Long studentId) {
+        return enrollmentRepository.findByStudentId(studentId);
     }
 
     public List<Student> getStudentsByCourse(Long courseId) {
